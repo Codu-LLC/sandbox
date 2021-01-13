@@ -1,17 +1,15 @@
-mkdir /mnt/sandbox
-cd /mnt/sandbox
-
-mkdir dev proc sys tmp
-
-mount --rbind /dev dev
+mkdir rootfs
+mount --bind /mnt/rootfs rootfs
+cd rootfs
+mkdir put_old
+pivot_root . put_old
+mount --rbind put_old/dev dev
 mount --make-rslave dev
-mount -t proc /proc proc
-mount --rbind /sys sys
+mount --rbind put_old/proc proc
+mount --make-rslave proc
+mount --rbind put_old/sys sys
 mount --make-rslave sys
-mount --rbind /tmp tmp
-
-cp -r /usr .
-cp -r /bin .
-cp -r /etc .
-cp -r /lib .
-cp -r /lib64 .
+mount --rbind put_old/tmp tmp
+# TODO(conankun): sync /usr /bin /etc /lib /lib64 if needed.
+umount -l put_old
+rm -rf put_old
