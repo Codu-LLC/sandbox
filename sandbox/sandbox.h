@@ -2,8 +2,8 @@
 // Created by Eugene Junghyun Kim on 1/7/2021.
 //
 
-#ifndef SERVER_SANDBOX_H
-#define SERVER_SANDBOX_H
+#ifndef SANDBOX_SANDBOX_H
+#define SANDBOX_SANDBOX_H
 
 #include <string>
 
@@ -61,4 +61,4 @@ public:
     void run();
 };
 
-#endif //SERVER_SANDBOX_H
+#endif //SANDBOX_SANDBOX_H
