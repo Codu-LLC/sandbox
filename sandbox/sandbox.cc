@@ -5,26 +5,18 @@
 // The stack size is 256MB.
 #define STACK_SIZE 268435456
 
-#include "limit.h"
+#include "debug.h"
+#include "execution.h"
 #include "rootfs.h"
 #include "sandbox.h"
 #include "sandbox_builder.h"
 #include "util.h"
 #include <errno.h>
 #include <iostream>
-#include <linux/seccomp.h>
-#include <sched.h>
-#include <signal.h>
 #include <string>
 #include <string.h>
-#include <sys/mount.h>
-#include <sys/prctl.h>
-#include <sys/stat.h>
-#include <sys/resource.h>
-#include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include <vector>
 
 static char child_stack[STACK_SIZE];
 
@@ -92,42 +84,9 @@ int Sandbox::get_file_size_limit_in_mb() const {
     return file_size_limit_in_mb;
 }
 
-void run_user_code(Sandbox *ptr, int *fd) {
-    if (close(fd[0]) == -1) {
-        std::cerr << "Failed to close read pipe" << strerror(errno) << std::endl;
-        exit(EXIT_FAILURE);
-    }
-    // TODO(conankun): Add cgroup command here. You might need to fork here to cgdelete successfully in parent process.
-    if (unshare(CLONE_NEWUSER) == -1) {
-        std::cerr << "Unsharing with new user namespace failed: " << strerror(errno) << std::endl;
-        exit(EXIT_FAILURE);
-    }
-    if (ptr->is_debug()) {
-        std::cerr << "PID after unshare: " << getpid() << std::endl;
-        std::cerr << "PPID after unshare: " << getppid() << std::endl;
-        std::cerr << "Real UID after unshare: " << getuid() << std::endl;
-        std::cerr << "Effective UID after unshare: " << geteuid() << std::endl;
-    }
-    dup2(fd[1], STDOUT_FILENO);
-    char *argv[] = {NULL};
-    char *env_variable[] = {NULL};
-    set_sandbox_limit(ptr);
-    execve(ptr->get_command().c_str(), argv, env_variable);
-    if (close(fd[1]) == -1) {
-        std::cerr << "Failed to close write pipe" << strerror(errno) << std::endl;
-        exit(EXIT_FAILURE);
-    }
-    exit(EXIT_SUCCESS);
-}
-
 static int launch_sandbox(void *args) {
     Sandbox *ptr = (Sandbox *) args;
-    if (ptr->is_debug()) {
-        std::cerr << "PID: " << getpid() << std::endl;
-        std::cerr << "PPID: " << getppid() << std::endl;
-        std::cerr << "Real UID: " << getuid() << std::endl;
-        std::cerr << "Effective UID: " << geteuid() << std::endl;
-    }
+    debug_process(ptr->is_debug());
 
     if (setup_rootfs(ptr) == -1) {
         std::cerr << "setup rootfs failed" << std::endl;
@@ -138,10 +97,12 @@ static int launch_sandbox(void *args) {
     int fd[2];
     if (pipe(fd) == -1) {
         std::cerr << "Opening a pipe failed: " << strerror(errno) << std::endl;
-        return 1;
+        return -1;
     }
     // Run the code provided by the user.
-    run_user_code(ptr, fd);
+    if (run_user_code(ptr, fd) == -1) {
+        return -1;
+    }
     return 0;
 }
 
