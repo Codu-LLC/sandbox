@@ -2,8 +2,8 @@
 // Created by Eugene Junghyun Kim on 1/8/2021.
 //
 
-#ifndef SERVER_SANDBOX_BUILDER_H
-#define SERVER_SANDBOX_BUILDER_H
+#ifndef SANDBOX_SANDBOX_BUILDER_H
+#define SANDBOX_SANDBOX_BUILDER_H
 
 #include "sandbox.h"
 #include <string>
@@ -31,4 +31,4 @@ public:
     Sandbox& build();
 };
 
-#endif //SERVER_SANDBOX_BUILDER_H
+#endif //SANDBOX_SANDBOX_BUILDER_H
