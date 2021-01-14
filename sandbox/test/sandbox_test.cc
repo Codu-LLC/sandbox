@@ -2,6 +2,7 @@
 // Created by Eugene Junghyun Kim on 1/10/2021.
 //
 
+#include "sandbox/limit.h"
 #include "sandbox/sandbox.h"
 #include "sandbox/sandbox_builder.h"
 #include "gtest/gtest.h"
