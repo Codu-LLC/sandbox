@@ -57,7 +57,7 @@ TEST(SandboxTest, CheckMemoryLimit) {
             {
                 cgroup->attach_process(getpid());
                 std::string test = "";
-                while(1) test += "test";
+                for(int i = 0; i < 10000000; i++) test += "test";
                 exit(EXIT_SUCCESS);
             }
         default: /* Parent */
