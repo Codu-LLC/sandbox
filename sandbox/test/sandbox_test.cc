@@ -10,7 +10,6 @@
 #include <cstdlib>
 #include <memory>
 #include <string>
-#include <sys/capability.h>
 #include <sys/types.h>
 #include <unistd.h>
 
