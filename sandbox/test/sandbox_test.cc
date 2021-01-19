@@ -63,7 +63,6 @@ TEST(SandboxTest, CheckMemoryLimit) {
         default: /* Parent */
             waitpid(pid, NULL, 0);
             EXPECT_TRUE(std::stoll(cgroup->get_property("memory", "max_usage_in_bytes")) >= MB);
-            PASS_TEST;
             break;
     }
 }
