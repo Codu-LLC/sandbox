@@ -26,6 +26,11 @@ jobs:
         echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
         sudo apt-get install -y bazel
 
+    - name: Download cgroup utils and setup test environment.
+      run: |
+        sudo apt-get install -y cgroup-bin
+        sudo bash sandbox/test/test_setup.sh
+
     - name: Run tests for sandbox
       run: |
         bazel test --test_output=all -c opt //sandbox/...

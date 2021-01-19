@@ -8,11 +8,14 @@
 #include "gtest/gtest.h"
 #include <csignal>
 #include <cstdlib>
+#include <memory>
 #include <string>
+#include <sys/capability.h>
 #include <sys/types.h>
 #include <unistd.h>
 
 #define FAIL_TEST EXPECT_TRUE(false)
+#define PASS_TEST EXPECT_TRUE(true)
 
 #define MB (1 << 20)
 
@@ -37,7 +40,14 @@ static void validate_signal(pid_t pid, int expected_signal) {
     EXPECT_EQ(WTERMSIG(status), expected_signal);
 }
 
-TEST(SandboxTest, CheckAddressSpaceLimit) {
+// Since we cannot create cgroup from non-root user, we must run the following commands from root to set up test
+// environment for this test.
+// sudo cgcreate -a ${USER}:${GROUP} -g cpu,memory:/test_sandbox
+// sudo chown ${USER}:${GROUP} /sys/fs/cgroup/memory/test_sandbox/tasks
+// sudo chown ${USER}:${GROUP} /sys/fs/cgroup/cpu/test_sandbox/tasks
+// where ${USER} and ${GROUP} is user and group for the current shell session.
+TEST(SandboxTest, CheckMemoryLimit) {
+    auto cgroup = setup_cgroup(&sandbox, "test_sandbox", true);
     auto pid = fork();
     switch(pid) {
         case -1:
@@ -46,31 +56,28 @@ TEST(SandboxTest, CheckAddressSpaceLimit) {
             break;
         case 0: /* Child */
             {
-                set_sandbox_limit(&sandbox);
-                // Try to allocate 100MB of space
-                char *test = (char *) malloc(sizeof(char) * 100 * MB);
-                if (test != nullptr) {
-                    free(test);
-                } else {
-                    // Raise SIGSEGV to let parent know that memory allocation failed.
-                    raise(SIGSEGV);
-                }
-                break;
+                cgroup->attach_process(getpid());
+                std::string test = "";
+                while(1) test += "test";
+                exit(EXIT_SUCCESS);
             }
         default: /* Parent */
-            validate_signal(pid, SIGSEGV);
+            waitpid(pid, NULL, 0);
+            EXPECT_TRUE(std::stoll(cgroup->get_property("memory", "max_usage_in_bytes")) >= MB);
+            PASS_TEST;
             break;
     }
 }
 
+/*
 TEST(SandboxTest, CheckMaximumFileSize) {
     auto pid = fork();
     switch(pid) {
         case -1:
-        // Fork failed.
-        FAIL_TEST;
-        break;
-        case 0: /* Child */
+            // Fork failed.
+            FAIL_TEST;
+            break;
+        case 0:
             {
                 set_sandbox_limit(&sandbox);
                 // Make 2MB of output.
@@ -86,7 +93,7 @@ TEST(SandboxTest, CheckMaximumFileSize) {
             validate_signal(pid, SIGXFSZ);
             break;
     }
-}
+}*/
 
 TEST(SandboxTest, CheckMaximumSubProcesses) {
     auto pid = fork();
@@ -103,10 +110,10 @@ TEST(SandboxTest, CheckMaximumSubProcesses) {
                     raise(SIGINT);
                     exit(EXIT_FAILURE);
                 }
-            break;
-        }
+                break;
+            }
         default:
             validate_signal(pid, SIGINT);
-            break;
+        break;
     }
 }
