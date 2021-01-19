@@ -68,7 +68,7 @@ TEST(SandboxTest, CheckMemoryLimit) {
     }
 }
 
-/*
+
 TEST(SandboxTest, CheckMaximumFileSize) {
     auto pid = fork();
     switch(pid) {
@@ -80,11 +80,18 @@ TEST(SandboxTest, CheckMaximumFileSize) {
             {
                 set_sandbox_limit(&sandbox);
                 // Make 2MB of output.
+                FILE *f = fopen("test_sandbox_file.txt", "w");
                 for (int i = 0; i < (MB >> 1); i++) {
-                    if (printf("test\n") < 0) {
+                    if (fprintf(f, "test\n") < 0) {
+                        if (f != NULL) {
+                            fclose(f);
+                        }
                         raise(SIGXFSZ);
                         exit(EXIT_FAILURE);
                     }
+                }
+                if (f != NULL) {
+                    fclose(f);
                 }
                 break;
             }
@@ -92,7 +99,7 @@ TEST(SandboxTest, CheckMaximumFileSize) {
             validate_signal(pid, SIGXFSZ);
             break;
     }
-}*/
+}
 
 TEST(SandboxTest, CheckMaximumSubProcesses) {
     auto pid = fork();
