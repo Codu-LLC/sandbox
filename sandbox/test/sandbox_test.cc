@@ -12,7 +12,6 @@
 #include <string>
 #include <sys/types.h>
 #include <unistd.h>
-#include <iostream>
 
 #define FAIL_TEST EXPECT_TRUE(false)
 #define PASS_TEST EXPECT_TRUE(true)
@@ -63,8 +62,6 @@ TEST(SandboxTest, CheckMemoryLimit) {
             }
         default: /* Parent */
             waitpid(pid, NULL, 0);
-            std::cout << cgroup->get_property("memory", "limit_in_bytes") << std::endl;
-            std::cout << cgroup->get_property("memory", "max_usage_in_bytes") << std::endl;
             EXPECT_TRUE(std::stoll(cgroup->get_property("memory", "max_usage_in_bytes")) >= MB);
             break;
     }
