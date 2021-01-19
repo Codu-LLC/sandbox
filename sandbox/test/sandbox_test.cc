@@ -46,7 +46,7 @@ static void validate_signal(pid_t pid, int expected_signal) {
 // sudo chown ${USER}:${GROUP} /sys/fs/cgroup/cpu/test_sandbox/tasks
 // where ${USER} and ${GROUP} is user and group for the current shell session.
 TEST(SandboxTest, CheckMemoryLimit) {
-    auto cgroup = setup_cgroup(&sandbox, "test_sandbox", true);
+    auto cgroup = setup_cgroup(&sandbox, "test_sandbox", false);
     auto pid = fork();
     switch(pid) {
         case -1:
