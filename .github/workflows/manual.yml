@@ -33,8 +33,9 @@ jobs:
     - name: Run tests for sandbox
       run: |
         sudo bash sandbox/test/test_setup.sh
+        export GROUP=${USER}
+        sudo cgcreate -a ${USER}:${GROUP} -g cpu,memory:/test_sandbox
+        sudo chown ${USER}:${GROUP} /sys/fs/cgroup/memory/test_sandbox/tasks
+        sudo chown ${USER}:${GROUP} /sys/fs/cgroup/cpu/test_sandbox/tasks
         ls -al /sys/fs/cgroup/memory/test_sandbox
-        id -u ${USER}
-        echo ${USER}
-        echo ${GROUP}
         bazel build -c opt --cxxopt='-std=c++14' //sandbox/test/... && bazel-bin/sandbox/test/test
