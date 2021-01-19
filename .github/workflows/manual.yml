@@ -26,12 +26,15 @@ jobs:
         echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
         sudo apt-get install -y bazel
 
-    - name: Download cgroup utils and setup test environment.
+    - name: Download cgroup utils.
       run: |
         sudo apt-get install -y cgroup-bin
-        sudo bash sandbox/test/test_setup.sh
-        ls -al /sys/fs/cgroup/memory/test_sandbox
 
     - name: Run tests for sandbox
       run: |
+        sudo bash sandbox/test/test_setup.sh
+        ls -al /sys/fs/cgroup/memory/test_sandbox
+        id -u ${USER}
+        echo ${USER}
+        echo ${GROUP}
         bazel build -c opt --cxxopt='-std=c++14' //sandbox/test/... && bazel-bin/sandbox/test/test
