@@ -30,7 +30,8 @@ jobs:
       run: |
         sudo apt-get install -y cgroup-bin
         sudo bash sandbox/test/test_setup.sh
+        ls -al /sys/fs/cgroup/memory/test_sandbox
 
     - name: Run tests for sandbox
       run: |
-        bazel build -c opt --cxxopt='-std=c++14' //sandbox/test/... && sudo bazel-bin/sandbox/test/test
+        bazel build -c opt --cxxopt='-std=c++14' //sandbox/test/... && bazel-bin/sandbox/test/test
