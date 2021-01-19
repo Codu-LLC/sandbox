@@ -33,4 +33,4 @@ jobs:
 
     - name: Run tests for sandbox
       run: |
-        bazel test --test_output=all -c opt //sandbox/...
+        bazel build -c opt --cxxopt='-std=c++14' //sandbox/test/... && bazel-bin/sandbox/test/test
