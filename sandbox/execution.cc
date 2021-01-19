@@ -6,7 +6,6 @@
 #include "debug.h"
 #include "execution.h"
 #include "limit.h"
-#include <libcgroup.h>
 #include <memory>
 #include <sched.h>
 #include <string>
