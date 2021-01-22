@@ -9,8 +9,8 @@
 
 class File {
 public:
-    static int write_file(std::string file_path, std::string str);
-    static std::string read_file(std::string file_path);
+    static bool write_file(const std::string &file_path, const std::string &str);
+    static std::string read_file(const std::string &file_path);
 };
 
 #endif //SANDBOX_FILE_H

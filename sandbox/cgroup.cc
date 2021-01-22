@@ -3,6 +3,7 @@
 //
 
 #include "cgroup.h"
+#include "file.h"
 #include "sandbox.h"
 #include <fstream>
 #include <string>
@@ -10,6 +11,13 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #define MB_TO_BYTES(x) ((x) << 20)
+
+static std::string get_filename(
+        const std::string &cgroup_name,
+        const std::string &controller,
+        const std::string &property) {
+    return "/sys/fs/cgroup/" + controller + "/" + cgroup_name + "/" + controller + "." + property;
+}
 
 static int run_command(const std::string &command) {
     auto pid = fork();
@@ -45,20 +53,11 @@ bool Cgroup::delete_cgroup() {
 }
 
 bool Cgroup::set_property(const std::string &controller, const std::string &property, const std::string &value) {
-    // TODO(conankun): replace with std::format once upgraded to C++20.
-    std::string command = "/usr/bin/cgset -r " + controller + "." + property + "=" + value + " " + cgroup_name;
-    return run_command(command) == 0 ? true : false;
+    return File::write_file(get_filename(cgroup_name, controller, property), value);
 }
 
 std::string Cgroup::get_property(const std::string &controller, const std::string &property) {
-    std::string filename = "/sys/fs/cgroup/" + controller + "/" + cgroup_name + "/" + controller + "." + property;
-    std::ifstream fd(filename);
-    std::string ret = "";
-    while (fd.good()) {
-        ret += fd.get();
-    }
-    fd.close();
-    return ret;
+    return File::read_file(get_filename(cgroup_name, controller, property));
 }
 
 bool Cgroup::attach_process(pid_t pid) {

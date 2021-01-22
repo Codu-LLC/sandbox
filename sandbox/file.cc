@@ -5,21 +5,23 @@
 #include "file.h"
 #include <fstream>
 #include <string>
+#include <iostream>
 
-int File::write_file(std::string file_path, std::string str) {
+bool File::write_file(const std::string &file_path, const std::string &str) {
     std::ofstream fd(file_path);
     if (!fd.is_open()) {
         return -1;
     }
     fd << str;
     fd.close();
-    return 0;
+    return fd.good();
 }
 
-std::string File::read_file(std::string file_path) {
+// TODO(conankun): add error handling (probably move to c lib for file io?).
+std::string File::read_file(const std::string &file_path) {
     std::ifstream fd(file_path);
     if (!fd.is_open()) {
-        return NULL;
+        return std::string();
     }
     std::string ret, str;
     while (getline(fd, str)) {

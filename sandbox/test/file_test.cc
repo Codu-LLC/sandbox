@@ -18,19 +18,19 @@ TEST(FileTest, WritingToExistingFileSucceed) {
     // Create the new file named WritingToExistingFileSucceed.txt
     FILE *f = fopen("WritingToExistingFileSucceed.txt", "w");
     fclose(f);
-    EXPECT_EQ(File::write_file("WritingToExistingFileSucceed.txt", "test"), 0);
+    EXPECT_EQ(File::write_file("WritingToExistingFileSucceed.txt", "test"), true);
     // Remove file.
     remove_file("WritingToExistingFileSucceed.txt");
 }
 
 TEST(FileTest, WritingToNonExistingFileSucceed) {
-    EXPECT_EQ(File::write_file("WritingToNonExistingFileSucceed.txt", "test"), 0);
+    EXPECT_EQ(File::write_file("WritingToNonExistingFileSucceed.txt", "test"), true);
     // Remove file.
     remove_file("WritingToNonExistingFileSucceed.txt");
 }
 
 TEST(FileTest, ReadingExistingFileSucceed) {
-    EXPECT_EQ(File::write_file("ReadingExistingFileSucceed.txt", "16348123123"), 0);
+    EXPECT_EQ(File::write_file("ReadingExistingFileSucceed.txt", "16348123123"), true);
     EXPECT_EQ(File::read_file("ReadingExistingFileSucceed.txt"), "16348123123");
     // Remove file.
     remove_file("ReadingExistingFileSucceed.txt");
