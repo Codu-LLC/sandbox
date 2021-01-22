@@ -84,6 +84,21 @@ int Sandbox::get_file_size_limit_in_mb() const {
     return file_size_limit_in_mb;
 }
 
+void Sandbox::set_time_elapsed(long long nanoseconds) {
+    time_elapsed_in_ms = nanoseconds / 1000000;
+}
+
+void Sandbox::set_memory_used(long long bytes) {
+    memory_used_in_mb = bytes >> 20;
+}
+
+long long Sandbox::get_time_elapsed() const {
+    return time_elapsed_in_ms;
+}
+
+long long Sandbox::get_memory_used() const {
+    return memory_used_in_mb;
+}
 static int launch_sandbox(void *args) {
     Sandbox *ptr = (Sandbox *) args;
     debug_process(ptr->is_debug());
