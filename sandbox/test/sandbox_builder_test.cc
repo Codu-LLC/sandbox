@@ -23,4 +23,9 @@ TEST(SandboxBuilderTest, ProducesCorrectSandboxConfiguration) {
     EXPECT_EQ(sandbox.get_src_root_fs_dir(), "/src/rootfs");
     EXPECT_EQ(sandbox.get_target_root_fs_dir(), "/target/rootfs");
     EXPECT_EQ(sandbox.get_command(), "./sandbox/test");
+    // Update the statistics after the run.
+    sandbox.set_time_elapsed(1000000LL);
+    sandbox.set_memory_used(1LL << 20);
+    EXPECT_EQ(sandbox.get_time_elapsed(), 1);
+    EXPECT_EQ(sandbox.get_memory_used(), 1);
 }
