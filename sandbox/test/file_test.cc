@@ -35,3 +35,10 @@ TEST(FileTest, ReadingExistingFileSucceed) {
     // Remove file.
     remove_file("ReadingExistingFileSucceed.txt");
 }
+
+TEST(FileTest, ReadingNonExistingFileFail) {
+    EXPECT_EQ(File::read_file("ReadingNonExistingFileFail.txt").empty(), true);
+    // Remove file in case it created the new file.
+    remove_file("ReadingExistingFileSucceed.txt");
+}
+

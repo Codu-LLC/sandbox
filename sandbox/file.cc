@@ -3,30 +3,42 @@
 //
 
 #include "file.h"
-#include <fstream>
+#include <cstdio>
 #include <string>
-#include <iostream>
 
 bool File::write_file(const std::string &file_path, const std::string &str) {
-    std::ofstream fd(file_path);
-    if (!fd.is_open()) {
-        return -1;
+    FILE *fd = fopen64(file_path.c_str(), "w");
+    if (fd == NULL) {
+        return false;
     }
-    fd << str;
-    fd.close();
-    return fd.good();
+    if (fputs(str.c_str(), fd) == -1) {
+        fclose(fd);
+        return false;
+    }
+    fclose(fd);
+    return true;
 }
 
 // TODO(conankun): add error handling (probably move to c lib for file io?).
 std::string File::read_file(const std::string &file_path) {
-    std::ifstream fd(file_path);
-    if (!fd.is_open()) {
+    std::string ret;
+    FILE *fd = fopen64(file_path.c_str(), "r");
+    if (fd == NULL) {
         return std::string();
     }
-    std::string ret, str;
-    while (getline(fd, str)) {
-        ret += str;
+    constexpr int BUFFER_SIZE = 512;
+    char buffer[BUFFER_SIZE];
+    while (true) {
+        int count = fread(buffer, sizeof(char), BUFFER_SIZE, fd);
+        if (count == -1) {
+            fclose(fd);
+            return std::string();
+        } else if (count == 0) {
+            break;
+        } else {
+            ret += buffer;
+        }
     }
-    fd.close();
+    fclose(fd);
     return ret;
 }
