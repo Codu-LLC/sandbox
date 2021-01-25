@@ -18,9 +18,9 @@ class Sandbox {
 private:
     bool debug;
     std::string src_root_fs_dir, target_root_fs_dir, sandbox_dir;
-    std::string command;
-    int time_limit_in_ms, memory_limit_in_mb, file_size_limit_in_mb;
-    long long time_elapsed_in_ms, memory_used_in_mb;
+    std::string command, output;
+    long long time_limit_in_ms, memory_limit_in_mb, file_size_limit_in_mb, time_elapsed_in_ms, memory_used_in_mb;
+    int return_code;
 protected:
     Sandbox() {}
 
@@ -56,15 +56,21 @@ public:
     std::string& get_target_root_fs_dir();
     std::string& get_sandbox_dir();
     std::string& get_command();
-    int get_time_limit_in_ms() const;
-    int get_memory_limit_in_mb() const;
-    int get_file_size_limit_in_mb() const;
+    // Set the output of the user submitted code.
+    void set_output(std::string &&output);
+    // Get the output of the user submitted code.
+    std::string& get_output();
+    long long get_time_limit_in_ms() const;
+    long long get_memory_limit_in_mb() const;
+    long long get_file_size_limit_in_mb() const;
     // Store the running time of the user submitted code in terms of CPU time (in ms).
     void set_time_elapsed(long long nanoseconds);
     // Store the memory usage of the user submitted code in MB.
     void set_memory_used(long long bytes);
     long long get_time_elapsed() const;
     long long get_memory_used() const;
+    void set_return_code(int return_code);
+    int get_return_code() const;
     void run();
 };
 

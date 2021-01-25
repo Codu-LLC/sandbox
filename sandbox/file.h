@@ -11,6 +11,7 @@ class File {
 public:
     static bool write_file(const std::string &file_path, const std::string &str);
     static std::string read_file(const std::string &file_path);
+    static int read_pipe(int fd, std::string &content, long long limit_in_bytes);
 };
 
 #endif //SANDBOX_FILE_H
