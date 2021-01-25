@@ -41,4 +41,3 @@ TEST(FileTest, ReadingNonExistingFileFail) {
     // Remove file in case it created the new file.
     remove_file("ReadingExistingFileSucceed.txt");
 }
-

@@ -10,6 +10,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+
 #define MB_TO_BYTES(x) ((x) << 20)
 
 static std::string get_filename(
@@ -63,7 +64,8 @@ std::string Cgroup::get_property(const std::string &controller, const std::strin
 bool Cgroup::attach_process(pid_t pid) {
     // TODO(conankun): replace with std::format once upgraded to C++20.
     std::string command =
-            "/usr/bin/cgclassify -g " + subsystems + ":/" + cgroup_name + " " + std::to_string(static_cast<uint32_t>(pid));
+            "/usr/bin/cgclassify -g " + subsystems + ":/" + cgroup_name + " " +
+            std::to_string(static_cast<uint32_t>(pid));
     return run_command(command) == 0 ? true : false;
 }
 
