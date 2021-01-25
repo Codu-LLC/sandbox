@@ -52,6 +52,10 @@ void Sandbox::set_file_size_limit_in_mb(int file_size_in_mb) {
     this->file_size_limit_in_mb = file_size_in_mb;
 }
 
+void Sandbox::set_output(std::string &&output) {
+    this->output = std::move(output);
+}
+
 bool Sandbox::is_debug() const {
     return debug;
 }
@@ -72,15 +76,15 @@ std::string &Sandbox::get_command() {
     return command;
 }
 
-int Sandbox::get_time_limit_in_ms() const {
+long long Sandbox::get_time_limit_in_ms() const {
     return time_limit_in_ms;
 }
 
-int Sandbox::get_memory_limit_in_mb() const {
+long long Sandbox::get_memory_limit_in_mb() const {
     return memory_limit_in_mb;
 }
 
-int Sandbox::get_file_size_limit_in_mb() const {
+long long Sandbox::get_file_size_limit_in_mb() const {
     return file_size_limit_in_mb;
 }
 
@@ -99,6 +103,18 @@ long long Sandbox::get_time_elapsed() const {
 long long Sandbox::get_memory_used() const {
     return memory_used_in_mb;
 }
+
+std::string& Sandbox::get_output() {
+    return output;
+}
+
+void Sandbox::set_return_code(int return_code) {
+    this->return_code = return_code;
+}
+int Sandbox::get_return_code() const {
+    return return_code;
+}
+
 static int launch_sandbox(void *args) {
     Sandbox *ptr = (Sandbox *) args;
     debug_process(ptr->is_debug());
@@ -109,13 +125,8 @@ static int launch_sandbox(void *args) {
     }
 
     // TODO(conankun): Add cgroup and seccomp.
-    int fd[2];
-    if (pipe(fd) == -1) {
-        std::cerr << "Opening a pipe failed: " << strerror(errno) << std::endl;
-        return -1;
-    }
     // Run the code provided by the user.
-    if (run_user_code(ptr, fd) == -1) {
+    if (run_user_code(ptr) == -1) {
         return -1;
     }
     return 0;

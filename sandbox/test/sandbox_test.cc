@@ -85,8 +85,6 @@ TEST(SandboxTest, CheckMaximumFileSize) {
                         if (f != NULL) {
                             fclose(f);
                         }
-                        raise(SIGXFSZ);
-                        exit(EXIT_FAILURE);
                     }
                 }
                 if (f != NULL) {

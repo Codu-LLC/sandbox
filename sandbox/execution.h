@@ -7,6 +7,6 @@
 
 #include "sandbox.h"
 
-extern "C" int run_user_code(Sandbox *ptr, int *fd);
+extern "C" int run_user_code(Sandbox *ptr);
 
 #endif //SANDBOX_EXECUTION_H
