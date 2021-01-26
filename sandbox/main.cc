@@ -16,7 +16,7 @@ int main() {
             .set_sandbox_dir("test1234")
             .set_src_root_fs_dir("/mnt/gccrootfs")
             .set_target_root_fs_dir("/home/ubuntu/rootfs")
-            .set_command("./sandbox/test_fs")
+            .set_command("./test_fs")
             //.set_command("./sandbox/test")
             .build();
     sandbox.run();
