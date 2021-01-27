@@ -37,25 +37,25 @@ int setup_rootfs(Sandbox *ptr) {
     }
 
     // Scope into new root file system directory.
-    if (chdir(ptr->get_target_root_fs_dir().c_str()) == -1 && errno != EEXIST) {
+    if (chdir(ptr->get_target_root_fs_dir().c_str()) == -1) {
         print_string(ptr->is_debug(), "Changing directory to the target rootfs failed.");
         return -1;
     }
 
-    if (mkdir("put_old", 0700) == -1) {
+    if (mkdir("sandbox/put_old", 0777) == -1 && errno != EEXIST) {
         print_string(ptr->is_debug(), "Making a directory for put_old failed.");
         return -1;
     }
 
     // Change the root to this directory.
-    if (pivot_root(".", "put_old") == -1) {
+    if (pivot_root(".", "sandbox/put_old") == -1) {
         print_string(ptr->is_debug(), "Pivot root failed.");
         return -1;
     }
 
     // Mount dev, proc, sys, and tmp from old root filesystem.
     // Mount dev.
-    if (mount("put_old/dev", "dev", "", MS_BIND | MS_REC, NULL) == -1) {
+    if (mount("sandbox/put_old/dev", "dev", "", MS_BIND | MS_REC, NULL) == -1) {
         print_string(ptr->is_debug(), "Mounting /dev failed.");
         return -1;
     }
@@ -65,7 +65,7 @@ int setup_rootfs(Sandbox *ptr) {
     }
 
     // Mount /proc.
-    if (mount("put_old/proc", "proc", "", MS_BIND | MS_REC, NULL) == -1) {
+    if (mount("sandbox/put_old/proc", "proc", "", MS_BIND | MS_REC, NULL) == -1) {
         print_string(ptr->is_debug(), "Mounting /proc failed.");
         return -1;
     }
@@ -75,7 +75,7 @@ int setup_rootfs(Sandbox *ptr) {
     }
 
     // Mount /sys.
-    if (mount("put_old/sys", "sys", "", MS_BIND | MS_REC, NULL) == -1) {
+    if (mount("sandbox/put_old/sys", "sys", "", MS_BIND | MS_REC, NULL) == -1) {
         print_string(ptr->is_debug(), "Mounting /sys failed.");
         return -1;
     }
@@ -86,18 +86,23 @@ int setup_rootfs(Sandbox *ptr) {
 
     // Mount /tmp.
     // TODO(conankun): Investigate if this is necessary.
-    if (mount("put_old/tmp", "tmp", "", MS_BIND | MS_REC, NULL) == -1) {
+    if (mount("sandbox/put_old/tmp", "tmp", "", MS_BIND | MS_REC, NULL) == -1) {
         print_string(ptr->is_debug(), "Mounting /tmp failed.");
         return -1;
     }
 
-    if (umount2("put_old", MNT_DETACH) == -1) {
+    if (umount2("sandbox/put_old", MNT_DETACH) == -1) {
         print_string(ptr->is_debug(), "Detaching old rootfs failed.");
         return -1;
     }
 
-    if (remove("put_old") == -1) {
+    if (remove("sandbox/put_old") == -1) {
         print_string(ptr->is_debug(), "Removing old rootfs failed.");
+        return -1;
+    }
+
+    if (chdir("sandbox") == -1) {
+        print_string(ptr->is_debug(), "Changing current directory to sandbox failed.");
         return -1;
     }
 

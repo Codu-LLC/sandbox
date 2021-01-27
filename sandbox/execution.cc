@@ -81,12 +81,6 @@ static int run_parent(Sandbox *ptr, std::unique_ptr<Cgroup> cgroup, pid_t pid, i
         }
     }
     waitpid(pid, &status, 0);
-    if (has_presentation_error) {
-        std::cerr << "Has presentation Error." << std::endl;
-    }
-    if (has_system_error) {
-        std::cerr << "Has system error. " << std::endl;
-    }
     // TODO(conankun): In case the process has not terminated, send SIGKILL.
     // Store output.
     ptr->set_output(std::move(output));
@@ -104,6 +98,7 @@ static int run_parent(Sandbox *ptr, std::unique_ptr<Cgroup> cgroup, pid_t pid, i
 
 int run_user_code(Sandbox *ptr) {
     int fd[2];
+    // TODO(conankun): create the random cgroup name.
     auto cgroup = setup_cgroup(ptr, "test_sandbox/subgroup", true);
     if (cgroup == nullptr) {
         return -1;
