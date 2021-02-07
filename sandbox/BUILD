@@ -9,6 +9,10 @@ cc_library(
 cc_binary(
     name = "app",
     srcs = ["main.cc"],
-    deps = [":sandbox"],
+    deps = [
+        ":sandbox",
+	"@com_google_absl//absl/flags:flag",
+	"@com_google_absl//absl/flags:parse",
+    ],
     visibility = ["//visibility:public"],
 )
