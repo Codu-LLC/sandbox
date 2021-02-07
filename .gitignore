@@ -33,3 +33,9 @@
 
 # Intellij
 .idea/*
+
+# Bazel
+bazel-bin
+bazel-sandbox
+bazel-testlogs
+bazel-out
