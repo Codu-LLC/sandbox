@@ -13,6 +13,7 @@
 #include "sandbox_builder.h"
 #include "util.h"
 #include <errno.h>
+#include <filesystem>
 #include <iostream>
 #include <string>
 #include <string.h>
@@ -144,10 +145,7 @@ static int launch_sandbox(void *args) {
         return -1;
     }
     auto stat = get_json_statistics(*ptr);
-    write(ptr->get_fd()[1], stat.c_str(), stat.size());
-    if (close(ptr->get_fd()[1]) == -1) {
-        exit(EXIT_FAILURE);
-    }
+    File::write_file(std::filesystem::path(ptr->get_sandbox_dir()) / "stat.txt", get_json_statistics(sandbox));
     return 0;
 }
 
@@ -171,13 +169,4 @@ void Sandbox::run() {
             (void *) this
     );
     waitpid(child_pid, NULL, 0);
-    char stat[PAGE_SIZE];
-    auto num_read = read(fd[0], stat, PAGE_SIZE);
-    if (num_read == -1) {
-        exit(EXIT_FAILURE);
-    }
-    std::cerr << stat << std::endl;
-    if (close(fd[0]) == -1) {
-        exit(EXIT_FAILURE);
-    }
 }

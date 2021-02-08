@@ -104,5 +104,4 @@ int main(int argc, char *argv[]) {
             .set_command(absl::GetFlag(FLAGS_command))
             .build();
     sandbox.run();
-    File::write_file(absl::GetFlag(FLAGS_statistics_file_path), get_json_statistics(sandbox));
 }
