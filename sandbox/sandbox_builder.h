@@ -7,6 +7,7 @@
 
 #include "sandbox.h"
 #include <string>
+#include <vector>
 
 class SandboxBuilder {
 private:
@@ -20,7 +21,7 @@ public:
 
     SandboxBuilder& set_sandbox_dir(std::string &&dir);
 
-    SandboxBuilder& set_command(std::string &&command);
+    SandboxBuilder& set_command(std::vector<std::string> &&command);
 
     SandboxBuilder& set_time_limit(int time_limit_in_ms);
 

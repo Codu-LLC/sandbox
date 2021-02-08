@@ -6,6 +6,7 @@
 #define SANDBOX_SANDBOX_H
 
 #include <string>
+#include <vector>
 
 class Sandbox;
 class SandboxBuilder;
@@ -18,7 +19,7 @@ class Sandbox {
 private:
     bool debug;
     std::string src_root_fs_dir, target_root_fs_dir, sandbox_dir;
-    std::string command, output;
+    std::vector<std::string> command;
     long long time_limit_in_ms, memory_limit_in_mb, file_size_limit_in_mb, time_elapsed_in_ms, memory_used_in_mb;
     int return_code;
 protected:
@@ -37,7 +38,7 @@ protected:
     void set_sandbox_dir(std::string &dir);
 
     // Set the command to execute inside the sandbox.
-    void set_command(std::string &command);
+    void set_command(std::vector<std::string> &command);
 
     // Set the timeout after which the sandbox terminates the process forcefully.
     void set_time_limit(int time_limit_in_ms);
@@ -55,11 +56,7 @@ public:
     std::string& get_src_root_fs_dir();
     std::string& get_target_root_fs_dir();
     std::string& get_sandbox_dir();
-    std::string& get_command();
-    // Set the output of the user submitted code.
-    void set_output(std::string &&output);
-    // Get the output of the user submitted code.
-    std::string& get_output();
+    std::vector<std::string>& get_command();
     long long get_time_limit_in_ms() const;
     long long get_memory_limit_in_mb() const;
     long long get_file_size_limit_in_mb() const;

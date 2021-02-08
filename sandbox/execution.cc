@@ -29,12 +29,14 @@ static void run_child(Sandbox *ptr, int *fd) {
     }
     print_string(ptr->is_debug(), "After unshare");
     debug_process(ptr->is_debug());
-    // Pipe stdout to fd[1].
-    dup2(fd[1], STDOUT_FILENO);
-    char *argv[] = {NULL};
+    std::vector<char *> argv;
+    for (size_t i = 0; i < ptr->get_command().size(); i++) {
+        argv.push_back(const_cast<char *>(ptr->get_command()[i].c_str()));
+    }
+    argv.push_back(NULL);
     char *env_variable[] = {NULL};
     set_sandbox_limit(ptr);
-    if (execve(ptr->get_command().c_str(), argv, env_variable) != 0) {
+    if (execve(ptr->get_command().front().c_str(), &argv[0], env_variable) != 0) {
         std::cerr << "execve error" << std::endl;
         perror("error: ");
     }
@@ -47,43 +49,18 @@ static void run_child(Sandbox *ptr, int *fd) {
 
 static int run_parent(Sandbox *ptr, std::unique_ptr<Cgroup> cgroup, pid_t pid, int *fd) {
     int status = 0;
-    bool has_system_error = false, has_presentation_error = false;
     std::string output;
-    if (close(fd[1]) == -1) {
-        has_system_error = true;
-    }
 
     auto pipe_limit = ptr->get_file_size_limit_in_mb() << 20;
 
     while (true) {
-        auto pipe_read_result = File::read_pipe(fd[0], output, pipe_limit);
-        switch (pipe_read_result) {
-            case -1:
-                has_system_error = true;
-                break;
-            case 0:
-                break;
-            case 1:
-                // Presentation Error.
-                has_presentation_error = true;
-                break;
-            default:
-                break;
-        }
-        if (has_presentation_error) {
-            kill(pid, SIGXFSZ);
-            break;
-        } else if (has_system_error) {
-            kill(pid, SIGTERM);
-            break;
-        } else if (waitpid(pid, &status, WNOHANG) != 0) {
+        if (waitpid(pid, &status, WNOHANG) != 0) {
             break;
         }
     }
     waitpid(pid, &status, 0);
     // TODO(conankun): In case the process has not terminated, send SIGKILL.
     // Store output.
-    ptr->set_output(std::move(output));
     // Set return code.
     ptr->set_return_code(status);
     // TODO(conankun): Add a signal catch to diversify verdict.
@@ -93,7 +70,7 @@ static int run_parent(Sandbox *ptr, std::unique_ptr<Cgroup> cgroup, pid_t pid, i
     ptr->set_time_elapsed(std::stoll(cgroup->get_property("cpuacct", "usage")));
     ptr->set_memory_used(std::stoll(cgroup->get_property("memory", "max_usage_in_bytes")));
     cgroup->delete_cgroup();
-    return has_system_error ? -1 : status;
+    return status;
 }
 
 int run_user_code(Sandbox *ptr) {

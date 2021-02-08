@@ -17,6 +17,7 @@
 #include <string.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <vector>
 
 static char child_stack[STACK_SIZE];
 
@@ -36,8 +37,8 @@ void Sandbox::set_sandbox_dir(std::string &dir) {
     this->sandbox_dir = dir;
 }
 
-void Sandbox::set_command(std::string &command) {
-    this->command = command;
+void Sandbox::set_command(std::vector<std::string> &command) {
+    this->command = std::move(command);
 }
 
 void Sandbox::set_time_limit(int time_limit_in_ms) {
@@ -50,10 +51,6 @@ void Sandbox::set_memory_limit(int memory_limit_in_mb) {
 
 void Sandbox::set_file_size_limit_in_mb(int file_size_in_mb) {
     this->file_size_limit_in_mb = file_size_in_mb;
-}
-
-void Sandbox::set_output(std::string &&output) {
-    this->output = std::move(output);
 }
 
 bool Sandbox::is_debug() const {
@@ -72,7 +69,7 @@ std::string &Sandbox::get_sandbox_dir() {
     return sandbox_dir;
 }
 
-std::string &Sandbox::get_command() {
+std::vector<std::string> &Sandbox::get_command() {
     return command;
 }
 
@@ -102,10 +99,6 @@ long long Sandbox::get_time_elapsed() const {
 
 long long Sandbox::get_memory_used() const {
     return memory_used_in_mb;
-}
-
-std::string& Sandbox::get_output() {
-    return output;
 }
 
 void Sandbox::set_return_code(int return_code) {
