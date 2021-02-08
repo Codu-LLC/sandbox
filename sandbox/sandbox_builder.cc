@@ -23,7 +23,7 @@ SandboxBuilder& SandboxBuilder::set_sandbox_dir(std::string &&dir) {
     this->sandbox.set_sandbox_dir(dir);
     return *this;
 }
-SandboxBuilder& SandboxBuilder::set_command(std::string &&command) {
+SandboxBuilder& SandboxBuilder::set_command(std::vector<std::string> &&command) {
     this->sandbox.set_command(command);
     return *this;
 }

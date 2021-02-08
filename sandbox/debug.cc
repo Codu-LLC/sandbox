@@ -29,6 +29,5 @@ void debug_sandbox_stat(Sandbox *ptr) {
         std::cerr << "Signal: " << WTERMSIG(ptr->get_return_code()) << std::endl;
         std::cerr << "Time Elapsed: " << ptr->get_time_elapsed() << " ms" << std::endl;
         std::cerr << "Memory Used: " << ptr->get_memory_used() << " MB" << std::endl;
-        std::cerr << "Output size: " << (ptr->get_output().size() >> 20) << " MB" << std::endl;
     }
 }
