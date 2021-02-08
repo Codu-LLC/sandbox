@@ -8,6 +8,7 @@
 
 #include "debug.h"
 #include "execution.h"
+#include "file.h"
 #include "rootfs.h"
 #include "sandbox.h"
 #include "sandbox_builder.h"
@@ -129,9 +130,6 @@ static std::string get_json_statistics(const Sandbox &sandbox) {
 
 static int launch_sandbox(void *args) {
     Sandbox *ptr = (Sandbox *) args;
-    if (close(ptr->get_fd()[0]) == -1) {
-        exit(EXIT_FAILURE);
-    }
     debug_process(ptr->is_debug());
 
     if (setup_rootfs(ptr) == -1) {
@@ -145,7 +143,9 @@ static int launch_sandbox(void *args) {
         return -1;
     }
     auto stat = get_json_statistics(*ptr);
-    File::write_file(std::filesystem::path(ptr->get_sandbox_dir()) / "stat.txt", get_json_statistics(sandbox));
+    if (!File::write_file("/sandbox/stat.txt", stat)) {
+	return -1;
+    }
     return 0;
 }
 
@@ -154,14 +154,6 @@ SandboxBuilder Sandbox::builder() {
 }
 
 void Sandbox::run() {
-    int fd[2];
-    if (pipe(fd) == -1) {
-        exit(EXIT_FAILURE);
-    }
-    set_fd(fd);
-    if (close(fd[1]) == -1) {
-        exit(EXIT_FAILURE);
-    }
     pid_t child_pid = clone(
             launch_sandbox,
             child_stack + STACK_SIZE,

@@ -22,7 +22,6 @@ private:
     std::vector<std::string> command;
     long long time_limit_in_ms, memory_limit_in_mb, file_size_limit_in_mb, time_elapsed_in_ms, memory_used_in_mb;
     int return_code;
-    int *fd;
 protected:
     Sandbox() {}
 
@@ -69,8 +68,6 @@ public:
     long long get_memory_used() const;
     void set_return_code(int return_code);
     int get_return_code() const;
-    void set_fd(int *fd);
-    int* get_fd();
     void run();
 };
 
