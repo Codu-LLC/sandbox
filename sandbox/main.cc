@@ -17,17 +17,26 @@
 
 #define NIL_STRING_ARRAY std::vector<std::string>()
 
-ABSL_FLAG(bool, is_debug, false, "If set to true, shows userful debug information");
+ABSL_FLAG(bool, is_debug,
+
+false, "If set to true, shows userful debug information");
+
 ABSL_FLAG(long long, time_limit, NIL_INTEGER, "The time limit of the executable code in miliseconds");
+
 ABSL_FLAG(long long, memory_limit, NIL_INTEGER, "The memory limit of the executable code in Megabytes");
+
 ABSL_FLAG(long long, file_size_limit, NIL_INTEGER,
-          "The limit of file size the executable code can create (especially stdout)");
-ABSL_FLAG(std::string, sandbox_dir, NIL_STRING, "The path for sandbox's working directory");
+"The limit of file size the executable code can create (especially stdout)");
+ABSL_FLAG(std::string, sandbox_dir, NIL_STRING,
+"The path for sandbox's working directory");
 ABSL_FLAG(std::string, src_root_fs_dir, NIL_STRING,
-          "The path for sandbox's root file system is stored (e.g /mnt/gccrootfs)");
-ABSL_FLAG(std::string, target_root_fs_dir, NIL_STRING,"The path where sandbox's root file system will be hosted");
-ABSL_FLAG(std::vector<std::string>, command, NIL_STRING_ARRAY, "The command for executing the code submitted by the user");
-ABSL_FLAG(std::string, statistics_file_path, NIL_STRING, "The path where the statistics from execution will be stored");
+"The path for sandbox's root file system is stored (e.g /mnt/gccrootfs)");
+ABSL_FLAG(std::string, target_root_fs_dir, NIL_STRING,
+"The path where sandbox's root file system will be hosted");
+ABSL_FLAG(std::vector<std::string>, command, NIL_STRING_ARRAY,
+"The command for executing the code submitted by the user");
+ABSL_FLAG(std::string, statistics_file_path, NIL_STRING,
+"The path where the statistics from execution will be stored");
 
 //
 // Before running, don't forget export BAZEL_CXXOPTS="-std=c++17"
@@ -72,32 +81,15 @@ bool has_required_flags(std::vector<std::string> &missing_flags) {
     return missing_flags.empty();
 }
 
-/**
- * The function that gets JSON-formatted string for statistics such as time elapsed, memory used, etc.
- * Args:
- *   sandbox: The reference to the sandbox object.
- * Returns:
- *   A string in JSON that contains statistics for the execution of user submitted code.
- */
-std::string get_json_statistics(const Sandbox &sandbox) {
-    std::string ret;
-    ret.append("{");
-    ret.append("\"time_elapsed\": " + std::to_string(sandbox.get_time_elapsed()) + ",");
-    ret.append("\"memory_used\": " + std::to_string(sandbox.get_memory_used()) + ",");
-    ret.append("\"return_code\": " + std::to_string(sandbox.get_return_code()));
-    ret.append("}");
-    return ret;
-}
-
 int main(int argc, char *argv[]) {
     absl::ParseCommandLine(argc, argv);
-    std::vector<std::string> missing_flags;
+    std::vector <std::string> missing_flags;
     if (!has_required_flags(missing_flags)) {
         for (auto missing_flag : missing_flags) {
-	    std::cerr << "The required flag \033[1;31m" << missing_flag << "\033[0m is missing." << std::endl;;
-	}
-	return -1;
-    }   
+            std::cerr << "The required flag \033[1;31m" << missing_flag << "\033[0m is missing." << std::endl;;
+        }
+        return -1;
+    }
 
     auto builder = Sandbox::builder();
 

@@ -4,6 +4,7 @@
 
 // The stack size is 256MB.
 #define STACK_SIZE 268435456
+#define PAGE_SIZE 4096
 
 #include "debug.h"
 #include "execution.h"
@@ -108,8 +109,28 @@ int Sandbox::get_return_code() const {
     return return_code;
 }
 
+/**
+ * The function that gets JSON-formatted string for statistics such as time elapsed, memory used, etc.
+ * Args:
+ *   sandbox: The reference to the sandbox object.
+ * Returns:
+ *   A string in JSON that contains statistics for the execution of user submitted code.
+ */
+static std::string get_json_statistics(const Sandbox &sandbox) {
+    std::string ret;
+    ret.append("{");
+    ret.append("\"time_elapsed\": " + std::to_string(sandbox.get_time_elapsed()) + ",");
+    ret.append("\"memory_used\": " + std::to_string(sandbox.get_memory_used()) + ",");
+    ret.append("\"return_code\": " + std::to_string(sandbox.get_return_code()));
+    ret.append("}");
+    return ret;
+}
+
 static int launch_sandbox(void *args) {
     Sandbox *ptr = (Sandbox *) args;
+    if (close(ptr->get_fd()[0]) == -1) {
+        exit(EXIT_FAILURE);
+    }
     debug_process(ptr->is_debug());
 
     if (setup_rootfs(ptr) == -1) {
@@ -117,10 +138,15 @@ static int launch_sandbox(void *args) {
         return -1;
     }
 
-    // TODO(conankun): Add cgroup and seccomp.
+    // TODO(conankun): Add seccomp.
     // Run the code provided by the user.
     if (run_user_code(ptr) == -1) {
         return -1;
+    }
+    auto stat = get_json_statistics(*ptr);
+    write(ptr->get_fd()[1], stat.c_str(), stat.size());
+    if (close(ptr->get_fd()[1]) == -1) {
+        exit(EXIT_FAILURE);
     }
     return 0;
 }
@@ -130,6 +156,14 @@ SandboxBuilder Sandbox::builder() {
 }
 
 void Sandbox::run() {
+    int fd[2];
+    if (pipe(fd) == -1) {
+        exit(EXIT_FAILURE);
+    }
+    set_fd(fd);
+    if (close(fd[1]) == -1) {
+        exit(EXIT_FAILURE);
+    }
     pid_t child_pid = clone(
             launch_sandbox,
             child_stack + STACK_SIZE,
@@ -137,4 +171,13 @@ void Sandbox::run() {
             (void *) this
     );
     waitpid(child_pid, NULL, 0);
+    char stat[PAGE_SIZE];
+    auto num_read = read(fd[0], stat, PAGE_SIZE);
+    if (num_read == -1) {
+        exit(EXIT_FAILURE);
+    }
+    std::cerr << stat << std::endl;
+    if (close(fd[0]) == -1) {
+        exit(EXIT_FAILURE);
+    }
 }
