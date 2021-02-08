@@ -6,7 +6,7 @@
 #include "sandbox/sandbox_builder.h"
 #include "gtest/gtest.h"
 #include <string>
-
+#include <vector>                                                                                                                                                             
 TEST(SandboxBuilderTest, ProducesCorrectSandboxConfiguration) {
     auto sandbox = Sandbox::builder()
                 .set_debug(true)
@@ -15,15 +15,14 @@ TEST(SandboxBuilderTest, ProducesCorrectSandboxConfiguration) {
                 .set_sandbox_dir("/sandbox")
                 .set_src_root_fs_dir("/src/rootfs")
                 .set_target_root_fs_dir("/target/rootfs")
-                .set_command("./sandbox/test")
+                .set_command({"./sandbox/test"})
                 .build();
     EXPECT_EQ(sandbox.get_time_limit_in_ms(), 1000);
     EXPECT_EQ(sandbox.get_memory_limit_in_mb(), 32);
     EXPECT_EQ(sandbox.get_sandbox_dir(), "/sandbox");
     EXPECT_EQ(sandbox.get_src_root_fs_dir(), "/src/rootfs");
     EXPECT_EQ(sandbox.get_target_root_fs_dir(), "/target/rootfs");
-    EXPECT_EQ(sandbox.get_command(), "./sandbox/test");
-    // Update the statistics after the run.
+    std::vector<std::string> expected_command = {"./sandbox/test"};                                                                                                               EXPECT_EQ(sandbox.get_command(), expected_command);                                                                                                                           // Update the statistics after the run.
     sandbox.set_time_elapsed(1000000LL);
     sandbox.set_memory_used(1LL << 20);
     EXPECT_EQ(sandbox.get_time_elapsed(), 1);

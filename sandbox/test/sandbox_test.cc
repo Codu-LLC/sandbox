@@ -26,7 +26,7 @@ auto sandbox = Sandbox::builder()
         .set_sandbox_dir("/sandbox")
         .set_src_root_fs_dir("/src/rootfs")
         .set_target_root_fs_dir("/target/rootfs")
-        .set_command("./sandbox/test")
+        .set_command({"./sandbox/test"})
         .build();
 
 static void validate_signal(pid_t pid, int expected_signal) {
