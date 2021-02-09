@@ -35,8 +35,6 @@ ABSL_FLAG(std::string, target_root_fs_dir, NIL_STRING,
 "The path where sandbox's root file system will be hosted");
 ABSL_FLAG(std::vector<std::string>, command, NIL_STRING_ARRAY,
 "The command for executing the code submitted by the user");
-ABSL_FLAG(std::string, statistics_file_path, NIL_STRING,
-"The path where the statistics from execution will be stored");
 
 //
 // Before running, don't forget export BAZEL_CXXOPTS="-std=c++17"
@@ -75,9 +73,6 @@ bool has_required_flags(std::vector<std::string> &missing_flags) {
     if (absl::GetFlag(FLAGS_command) == NIL_STRING_ARRAY) {
         missing_flags.emplace_back("command");
     }
-    if (absl::GetFlag(FLAGS_statistics_file_path) == NIL_STRING) {
-        missing_flags.emplace_back("statistics_file_path");
-    }
     return missing_flags.empty();
 }
 
@@ -92,7 +87,6 @@ int main(int argc, char *argv[]) {
     }
 
     auto builder = Sandbox::builder();
-
     auto sandbox = builder
             .set_debug(absl::GetFlag(FLAGS_is_debug))
             .set_time_limit(absl::GetFlag(FLAGS_time_limit))
