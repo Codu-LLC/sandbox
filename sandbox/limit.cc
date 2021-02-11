@@ -23,7 +23,7 @@ std::unique_ptr <Cgroup> setup_cgroup(Sandbox *ptr, const std::string &cgroup_na
         return nullptr;
     }
     if (!cgroup->set_property("memory", "limit_in_bytes",
-                              std::to_string(MB_TO_BYTES(ptr->get_memory_limit_in_mb() << 1)))) {
+                              std::to_string(MB_TO_BYTES((int)(ptr->get_memory_limit_in_mb() * 1.1))))) {
         return nullptr;
     }
     if (!cgroup->set_property("cpu", "shares", "512")) {

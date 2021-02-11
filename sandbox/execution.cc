@@ -51,8 +51,6 @@ static int run_parent(Sandbox *ptr, std::unique_ptr<Cgroup> cgroup, pid_t pid, i
     int status = 0;
     std::string output;
 
-    auto pipe_limit = ptr->get_file_size_limit_in_mb() << 20;
-
     while (true) {
         if (waitpid(pid, &status, WNOHANG) != 0) {
             break;
