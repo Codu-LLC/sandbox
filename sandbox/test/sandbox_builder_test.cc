@@ -24,7 +24,7 @@ TEST(SandboxBuilderTest, ProducesCorrectSandboxConfiguration) {
     EXPECT_EQ(sandbox.get_target_root_fs_dir(), "/target/rootfs");
     std::vector<std::string> expected_command = {"./sandbox/test"};                                                                                                               EXPECT_EQ(sandbox.get_command(), expected_command);                                                                                                                           // Update the statistics after the run.
     sandbox.set_time_elapsed(1000000LL);
-    sandbox.set_memory_used(1LL << 10);
+    sandbox.set_memory_used(1LL << 20);
     EXPECT_EQ(sandbox.get_time_elapsed(), 1);
-    EXPECT_EQ(sandbox.get_memory_used(), 1);
+    EXPECT_EQ(sandbox.get_memory_used(), 1024);
 }
