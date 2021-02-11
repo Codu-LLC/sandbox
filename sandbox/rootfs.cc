@@ -105,6 +105,12 @@ int setup_rootfs(Sandbox *ptr) {
         print_string(ptr->is_debug(), "Changing current directory to sandbox failed.");
         return -1;
     }
+    FILE *f = fopen("stat.txt", "w");
+    if (f == NULL) {
+        print_string(ptr->is_debug(), "Creating stat file failed.");
+	return -1;
+    }
+    fclose(f);
 
     return 0;
 }
