@@ -26,5 +26,5 @@ TEST(SandboxBuilderTest, ProducesCorrectSandboxConfiguration) {
     sandbox.set_time_elapsed(1000000LL);
     sandbox.set_memory_used(1LL << 20);
     EXPECT_EQ(sandbox.get_time_elapsed(), 1);
-    EXPECT_EQ(sandbox.get_memory_used(), 1);
+    EXPECT_EQ(sandbox.get_memory_used(), 1024);
 }

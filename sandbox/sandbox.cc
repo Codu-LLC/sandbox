@@ -92,7 +92,7 @@ void Sandbox::set_time_elapsed(long long nanoseconds) {
 }
 
 void Sandbox::set_memory_used(long long bytes) {
-    memory_used_in_mb = bytes >> 20;
+    memory_used_in_mb = bytes >> 10;
 }
 
 long long Sandbox::get_time_elapsed() const {
