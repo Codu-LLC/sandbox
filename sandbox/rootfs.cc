@@ -6,7 +6,9 @@
 #include "rootfs.h"
 #include "sandbox.h"
 #include "util.h"
+#include <fcntl.h>
 #include <iostream>
+#include <sys/types.h>
 #include <sys/mount.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -105,12 +107,12 @@ int setup_rootfs(Sandbox *ptr) {
         print_string(ptr->is_debug(), "Changing current directory to sandbox failed.");
         return -1;
     }
-    FILE *f = fopen("stat.txt", "w");
-    if (f == NULL) {
+    int f = open("stat.txt", O_CREAT, 0777);
+    if (f == -1) {
         print_string(ptr->is_debug(), "Creating stat file failed.");
 	return -1;
     }
-    fclose(f);
+    close(f);
 
     return 0;
 }
