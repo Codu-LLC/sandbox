@@ -53,7 +53,7 @@ void set_sandbox_limit(Sandbox *ptr) {
     // Set the limit on the number of open file descriptors.
     set_resource_limit(RLIMIT_NOFILE, 10);
     // Limit creating another thread or process.
-    set_resource_limit(RLIMIT_NPROC, 1);
+    set_resource_limit(RLIMIT_NPROC, 256);
     // Limit in Wall time. If process is sleeping, they are not consuming cpu time and thus can block grading system
     // from processing future requests. Therefore, there should be an enforcement on wall time
     alarm(static_cast<int>(ceil(MILLISECONDS_TO_SECONDS(ptr->get_time_limit_in_ms()))) << 1);

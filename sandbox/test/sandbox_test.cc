@@ -108,11 +108,13 @@ TEST(SandboxTest, CheckMaximumSubProcesses) {
         case 0: /* Child */
             {
                 set_sandbox_limit(&sandbox);
-                // This fork should fail.
-                if (fork() == -1) {
-                    raise(SIGINT);
-                    exit(EXIT_FAILURE);
-                }
+                // This fork should fail if the number of calls goes beyond the limit.
+                for (int i = 0; i < 100000; i++) {
+		    if (fork() == -1) {
+                        raise(SIGINT);
+                        exit(EXIT_FAILURE);
+                    }
+		}
                 break;
             }
         default:
