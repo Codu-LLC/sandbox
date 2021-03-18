@@ -1,7 +1,12 @@
-PY_ROOTFS=/mnt/pyrootfs
-GCC_ROOTFS=/mnt/gccrootfs
-JAVA_ROOTFS=/mnt/javarootfs
-NODE_ROOTFS=/mnt/noderootfs
+#!/bin/bash
+ROOT_DIR=/mnt
+if [[ $1 ]]; then
+	ROOT_DIR=$1
+fi
+PY_ROOTFS=${ROOT_DIR}/pyrootfs
+GCC_ROOTFS=${ROOT_DIR}/gccrootfs
+JAVA_ROOTFS=${ROOT_DIR}/javarootfs
+NODE_ROOTFS=${ROOT_DIR}/noderootfs
 
 # When updating this version, also update version in generate_images.sh as well.
 PY_IMAGE_VERSION=1.0
