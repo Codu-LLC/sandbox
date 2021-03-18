@@ -18,6 +18,7 @@
 std::unique_ptr <Cgroup> setup_cgroup(Sandbox *ptr, const std::string &cgroup_name, bool create) {
     auto cgroup = std::make_unique<Cgroup>(cgroup_name);
     cgroup->add_controller("cpu");
+    cgroup->add_controller("cpuacct");
     cgroup->add_controller("memory");
     if (create && !cgroup->setup_cgroup()) {
         return nullptr;
